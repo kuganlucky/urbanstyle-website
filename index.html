@@ -3,680 +3,994 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UrbanStyle - Modern Fashion E-Commerce</title>
+    <title>Voyageur | Discover Your Next Adventure</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <style>
-        /* Custom animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap');
+        
+        :root {
+            --primary: #3a86ff;
+            --secondary: #8338ec;
+            --accent: #ff006e;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
         }
         
-        .animate-fade-in {
-            animation: fadeIn 0.5s ease-out forwards;
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f7fa;
+            color: var(--dark);
         }
         
-        .delay-100 { animation-delay: 0.1s; }
-        .delay-200 { animation-delay: 0.2s; }
-        .delay-300 { animation-delay: 0.3s; }
-        
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
+        h1, h2, h3, h4 {
+            font-family: 'Playfair Display', serif;
         }
         
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
+        .card-hover {
+            transition: all 0.3s ease;
         }
         
-        ::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 4px;
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
         
-        ::-webkit-scrollbar-thumb:hover {
-            background: #555;
+        .destination-card {
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
         }
         
-        /* Cart slide-in effect */
-        .cart-slide {
-            transform: translateX(100%);
-            transition: transform 0.3s ease-out;
+        .destination-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+            z-index: 1;
         }
         
-        .cart-slide.show {
-            transform: translateX(0);
+        .booking-form {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .testimonial-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .nav-link {
+            position: relative;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .active-nav::after {
+            width: 100%;
+        }
+        
+        .animated-bg {
+            animation: gradient 15s ease infinite;
+            background-size: 400% 400%;
+        }
+        
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
         }
     </style>
 </head>
-<body class="bg-gray-50 font-sans">
-    <!-- Header/Navigation -->
-    <header class="bg-white shadow-sm sticky top-0 z-50">
-        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-            <div class="flex items-center space-x-2">
-                <i class="fas fa-tshirt text-2xl text-indigo-600"></i>
-                <h1 class="text-xl font-bold text-gray-800">UrbanStyle</h1>
-            </div>
-            
-            <nav class="hidden md:flex space-x-8">
-                <a href="#" class="text-gray-800 hover:text-indigo-600 font-medium">Home</a>
-                <a href="#" class="text-gray-800 hover:text-indigo-600 font-medium">Shop</a>
-                <a href="#" class="text-gray-800 hover:text-indigo-600 font-medium">Collections</a>
-                <a href="#" class="text-gray-800 hover:text-indigo-600 font-medium">About</a>
-                <a href="#" class="text-gray-800 hover:text-indigo-600 font-medium">Contact</a>
-            </nav>
-            
-            <div class="flex items-center space-x-4">
-                <button id="search-btn" class="p-2 text-gray-600 hover:text-indigo-600">
-                    <i class="fas fa-search"></i>
-                </button>
-                <button id="cart-btn" class="p-2 text-gray-600 hover:text-indigo-600 relative">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span id="cart-count" class="absolute -top-1 -right-1 bg-indigo-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
-                </button>
-                <button class="md:hidden p-2 text-gray-600 hover:text-indigo-600" id="mobile-menu-btn">
-                    <i class="fas fa-bars"></i>
-                </button>
-            </div>
-        </div>
-        
-        <!-- Mobile Menu -->
-        <div id="mobile-menu" class="hidden md:hidden bg-white border-t">
-            <div class="container mx-auto px-4 py-2 flex flex-col space-y-2">
-                <a href="#" class="py-2 text-gray-800 hover:text-indigo-600">Home</a>
-                <a href="#" class="py-2 text-gray-800 hover:text-indigo-600">Shop</a>
-                <a href="#" class="py-2 text-gray-800 hover:text-indigo-600">Collections</a>
-                <a href="#" class="py-2 text-gray-800 hover:text-indigo-600">About</a>
-                <a href="#" class="py-2 text-gray-800 hover:text-indigo-600">Contact</a>
-            </div>
-        </div>
-        
-        <!-- Search Bar -->
-        <div id="search-bar" class="hidden bg-white border-t">
-            <div class="container mx-auto px-4 py-3">
-                <div class="relative">
-                    <input type="text" placeholder="Search for products..." class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <button class="absolute right-3 top-2 text-gray-500 hover:text-indigo-600">
-                        <i class="fas fa-search"></i>
+<body>
+    <!-- Navigation -->
+    <nav class="fixed w-full bg-white shadow-sm z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex-shrink-0 flex items-center">
+                    <span class="text-2xl font-bold text-indigo-600">Voyageur</span>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-center space-x-8">
+                        <a href="#" class="nav-link active-nav text-gray-900 px-3 py-2 text-sm font-medium">Home</a>
+                        <a href="#destinations" class="nav-link text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium">Destinations</a>
+                        <a href="#deals" class="nav-link text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium">Special Deals</a>
+                        <a href="#testimonials" class="nav-link text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium">Testimonials</a>
+                        <a href="#contact" class="nav-link text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium">Contact</a>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="bg-indigo-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-indigo-700 transition duration-300">
+                        Sign In
+                    </button>
+                    <button class="md:hidden text-gray-500 hover:text-gray-900">
+                        <i class="fas fa-bars text-xl"></i>
                     </button>
                 </div>
             </div>
         </div>
-    </header>
+    </nav>
 
-    <!-- Hero Section -->
-    <section class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-16">
-        <div class="container mx-auto px-4 flex flex-col md:flex-row items-center">
-            <div class="md:w-1/2 mb-8 md:mb-0 animate-fade-in">
-                <h2 class="text-4xl md:text-5xl font-bold mb-4">Summer Collection 2023</h2>
-                <p class="text-xl mb-6">Discover our latest trends in fashion. Comfort meets style in our new arrivals.</p>
-                <button class="bg-white text-indigo-600 px-6 py-3 rounded-lg font-medium hover:bg-gray-100 transition duration-300 transform hover:scale-105">
-                    Shop Now
-                </button>
-            </div>
-            <div class="md:w-1/2 animate-fade-in delay-100">
-                <img src="https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Fashion Model" class="rounded-lg shadow-xl w-full h-auto max-h-96 object-cover">
+    <!-- Hero Section with Booking Tabs -->
+    <section class="pt-24 pb-16 md:pt-32 md:pb-24 text-white bg-cover bg-center" style="background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1506929562872-bb421503ef21?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80');">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="md:flex items-center justify-between">
+                <div class="md:w-1/2 mb-10 md:mb-0">
+                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6 animate__animated animate__fadeInDown">
+                        Discover Your Next <span class="text-yellow-300">Adventure</span>
+                    </h1>
+                    <p class="text-lg md:text-xl mb-8 opacity-90">
+                        Explore the world's most breathtaking destinations with our expertly curated travel experiences. Your dream vacation starts here.
+                    </p>
+                    <div class="flex flex-wrap gap-4">
+                        <button class="bg-white text-indigo-600 px-6 py-3 rounded-full font-medium hover:bg-gray-100 transition duration-300 flex items-center">
+                            <i class="fas fa-compass mr-2"></i> Explore Now
+                        </button>
+                        <button class="border-2 border-white text-white px-6 py-3 rounded-full font-medium hover:bg-white hover:bg-opacity-10 transition duration-300 flex items-center">
+                            <i class="fas fa-play-circle mr-2"></i> Watch Video
+                        </button>
+                    </div>
+                </div>
+                <div class="md:w-1/2 relative">
+                    <div class="booking-form p-6 md:p-8 bg-white rounded-lg">
+                        <div class="flex border-b mb-6">
+                            <button type="button" class="tab-btn active px-4 py-2 font-medium text-indigo-600 border-b-2 border-indigo-600" data-tab="flights">Flights</button>
+                            <button type="button" class="tab-btn px-4 py-2 font-medium text-gray-500 hover:text-indigo-600" data-tab="hotels">Hotels</button>
+                            <button type="button" class="tab-btn px-4 py-2 font-medium text-gray-500 hover:text-indigo-600" data-tab="packages">Packages</button>
+                        </div>
+                        
+                        <!-- Flights Tab -->
+                        <form id="flights-form" class="tab-content active">
+                            <h3 class="text-xl font-bold text-gray-800 mb-6">Find Flights</h3>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-medium mb-2" for="destination">Destination</label>
+                                <div class="relative">
+                                    <select id="destination" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                        <option value="">Where to?</option>
+                                        <option value="paris">Paris, France</option>
+                                        <option value="bali">Bali, Indonesia</option>
+                                        <option value="tokyo">Tokyo, Japan</option>
+                                        <option value="new-york">New York, USA</option>
+                                        <option value="santorini">Santorini, Greece</option>
+                                    </select>
+                                    <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                        <i class="fas fa-map-marker-alt text-gray-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-gray-700 text-sm font-medium mb-2" for="check-in">Check In</label>
+                                    <div class="relative">
+                                        <input type="date" id="check-in" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                            <i class="fas fa-calendar-alt text-gray-400"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 text-sm font-medium mb-2" for="check-out">Check Out</label>
+                                    <div class="relative">
+                                        <input type="date" id="check-out" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                            <i class="fas fa-calendar-alt text-gray-400"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-6">
+                                <label class="block text-gray-700 text-sm font-medium mb-2" for="guests">Guests</label>
+                                <div class="relative">
+                                    <select id="guests" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                        <option value="1">1 Adult</option>
+                                        <option value="2">2 Adults</option>
+                                        <option value="3">3 Adults</option>
+                                        <option value="4">4 Adults</option>
+                                        <option value="family">Family</option>
+                                    </select>
+                                    <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                        <i class="fas fa-user-friends text-gray-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-indigo-700 transition duration-300 flex items-center justify-center">
+                                <i class="fas fa-search mr-2"></i> Search Packages
+                            </button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Featured Categories -->
-    <section class="py-12 bg-white">
-        <div class="container mx-auto px-4">
-            <h2 class="text-3xl font-bold text-center mb-12">Shop by Category</h2>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-                <div class="bg-gray-100 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition duration-300 animate-fade-in delay-100">
-                    <div class="h-48 bg-indigo-100 flex items-center justify-center">
-                        <i class="fas fa-tshirt text-5xl text-indigo-600"></i>
+    <!-- Popular Destinations -->
+    <section id="destinations" class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Popular Destinations</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Explore our handpicked selection of the world's most captivating travel destinations.
+                </p>
+            </div>
+            
+            <div class="flex flex-wrap gap-4 mb-8">
+                <select id="region-filter" class="px-4 py-2 border rounded-lg">
+                    <option value="all">All Regions</option>
+                    <option value="europe">Europe</option>
+                    <option value="asia">Asia</option>
+                    <option value="africa">Africa</option>
+                    <option value="north-america">North America</option>
+                </select>
+                <select id="sort-by" class="px-4 py-2 border rounded-lg">
+                    <option value="popularity">Sort by: Popularity</option>
+                    <option value="price-low">Price: Low to High</option>
+                    <option value="price-high">Price: High to Low</option>
+                    <option value="rating">Rating</option>
+                </select>
+            </div>
+
+            <div id="destinations-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Destination 1 -->
+                <div class="destination-card card-hover animate__animated animate__fadeInUp" style="animation-delay: 0.1s">
+                    <img src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Paris" class="w-full h-64 object-cover">
+                    <div class="absolute bottom-0 left-0 p-6 z-10">
+                        <h3 class="text-xl font-bold text-white mb-2">Paris, France</h3>
+                        <div class="flex items-center text-white">
+                            <i class="fas fa-map-marker-alt mr-2"></i>
+                            <span>Europe</span>
+                        </div>
                     </div>
-                    <div class="p-4">
-                        <h3 class="font-semibold text-lg mb-2">T-Shirts</h3>
-                        <button class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">Shop Now →</button>
+                    <div class="absolute top-4 right-4 z-10">
+                        <button class="bg-white bg-opacity-90 text-indigo-600 p-2 rounded-full hover:bg-opacity-100 transition duration-300">
+                            <i class="fas fa-heart"></i>
+                        </button>
                     </div>
                 </div>
                 
-                <div class="bg-gray-100 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition duration-300 animate-fade-in delay-200">
-                    <div class="h-48 bg-pink-100 flex items-center justify-center">
-                        <i class="fas fa-vest text-5xl text-pink-600"></i>
+                <!-- Destination 2 -->
+                <div class="destination-card card-hover">
+                    <img src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Bali" class="w-full h-64 object-cover">
+                    <div class="absolute bottom-0 left-0 p-6 z-10">
+                        <h3 class="text-xl font-bold text-white mb-2">Bali, Indonesia</h3>
+                        <div class="flex items-center text-white">
+                            <i class="fas fa-map-marker-alt mr-2"></i>
+                            <span>Asia</span>
+                        </div>
                     </div>
-                    <div class="p-4">
-                        <h3 class="font-semibold text-lg mb-2">Jackets</h3>
-                        <button class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">Shop Now →</button>
-                    </div>
-                </div>
-                
-                <div class="bg-gray-100 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition duration-300 animate-fade-in delay-300">
-                    <div class="h-48 bg-blue-100 flex items-center justify-center">
-                        <i class="fas fa-shoe-prints text-5xl text-blue-600"></i>
-                    </div>
-                    <div class="p-4">
-                        <h3 class="font-semibold text-lg mb-2">Shoes</h3>
-                        <button class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">Shop Now →</button>
+                    <div class="absolute top-4 right-4 z-10">
+                        <button class="bg-white bg-opacity-90 text-indigo-600 p-2 rounded-full hover:bg-opacity-100 transition duration-300">
+                            <i class="fas fa-heart"></i>
+                        </button>
                     </div>
                 </div>
                 
-                <div class="bg-gray-100 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition duration-300 animate-fade-in delay-100">
-                    <div class="h-48 bg-green-100 flex items-center justify-center">
-                        <i class="fas fa-hat-cowboy text-5xl text-green-600"></i>
+                <!-- Destination 3 -->
+                <div class="destination-card card-hover">
+                    <img src="https://images.unsplash.com/photo-1492571350019-22de08371fd3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Tokyo" class="w-full h-64 object-cover">
+                    <div class="absolute bottom-0 left-0 p-6 z-10">
+                        <h3 class="text-xl font-bold text-white mb-2">Tokyo, Japan</h3>
+                        <div class="flex items-center text-white">
+                            <i class="fas fa-map-marker-alt mr-2"></i>
+                            <span>Asia</span>
+                        </div>
                     </div>
-                    <div class="p-4">
-                        <h3 class="font-semibold text-lg mb-2">Accessories</h3>
-                        <button class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">Shop Now →</button>
+                    <div class="absolute top-4 right-4 z-10">
+                        <button class="bg-white bg-opacity-90 text-indigo-600 p-2 rounded-full hover:bg-opacity-100 transition duration-300">
+                            <i class="fas fa-heart"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Destination 4 -->
+                <div class="destination-card card-hover">
+                    <img src="https://images.unsplash.com/photo-1485871981521-5b1fd3805eee?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="New York" class="w-full h-64 object-cover">
+                    <div class="absolute bottom-0 left-0 p-6 z-10">
+                        <h3 class="text-xl font-bold text-white mb-2">New York, USA</h3>
+                        <div class="flex items-center text-white">
+                            <i class="fas fa-map-marker-alt mr-2"></i>
+                            <span>North America</span>
+                        </div>
+                    </div>
+                    <div class="absolute top-4 right-4 z-10">
+                        <button class="bg-white bg-opacity-90 text-indigo-600 p-2 rounded-full hover:bg-opacity-100 transition duration-300">
+                            <i class="fas fa-heart"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Destination 5 -->
+                <div class="destination-card card-hover">
+                    <img src="https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Santorini" class="w-full h-64 object-cover">
+                    <div class="absolute bottom-0 left-0 p-6 z-10">
+                        <h3 class="text-xl font-bold text-white mb-2">Santorini, Greece</h3>
+                        <div class="flex items-center text-white">
+                            <i class="fas fa-map-marker-alt mr-2"></i>
+                            <span>Europe</span>
+                        </div>
+                    </div>
+                    <div class="absolute top-4 right-4 z-10">
+                        <button class="bg-white bg-opacity-90 text-indigo-600 p-2 rounded-full hover:bg-opacity-100 transition duration-300">
+                            <i class="fas fa-heart"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Destination 6 -->
+                <div class="destination-card card-hover">
+                    <img src="https://images.unsplash.com/photo-1523482580672-f109ba8cb9be?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Sydney" class="w-full h-64 object-cover">
+                    <div class="absolute bottom-0 left-0 p-6 z-10">
+                        <h3 class="text-xl font-bold text-white mb-2">Sydney, Australia</h3>
+                        <div class="flex items-center text-white">
+                            <i class="fas fa-map-marker-alt mr-2"></i>
+                            <span>Oceania</span>
+                        </div>
+                    </div>
+                    <div class="absolute top-4 right-4 z-10">
+                        <button class="bg-white bg-opacity-90 text-indigo-600 p-2 rounded-full hover:bg-opacity-100 transition duration-300">
+                            <i class="fas fa-heart"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-12">
+                <button class="bg-indigo-600 text-white px-6 py-3 rounded-full font-medium hover:bg-indigo-700 transition duration-300 flex items-center mx-auto">
+                    <i class="fas fa-globe-americas mr-2"></i> View All Destinations
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Special Deals -->
+    <section id="deals" class="py-16 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Special Travel Deals</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Exclusive offers and packages to make your dream vacation more affordable.
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Deal 1 -->
+                <div class="bg-white rounded-xl overflow-hidden shadow-lg card-hover animate__animated animate__fadeIn" style="animation-delay: 0.2s">
+                    <div class="md:flex">
+                        <div class="md:w-1/3">
+                            <img src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Maldives" class="w-full h-full object-cover">
+                        </div>
+                        <div class="p-6 md:w-2/3">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="text-xl font-bold text-gray-900">Maldives Paradise</h3>
+                                <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded">30% OFF</span>
+                            </div>
+                            <div class="flex items-center text-gray-600 mb-4">
+                                <i class="fas fa-map-marker-alt text-sm mr-2"></i>
+                                <span class="text-sm">Maldives</span>
+                                <span class="mx-2">•</span>
+                                <i class="fas fa-calendar-alt text-sm mr-2"></i>
+                                <span class="text-sm">7 Days</span>
+                            </div>
+                            <p class="text-gray-600 mb-4">
+                                Experience luxury in overwater bungalows with private pools, all-inclusive dining, and breathtaking ocean views.
+                            </p>
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <span class="text-gray-500 line-through text-sm">$2,499</span>
+                                    <span class="text-indigo-600 font-bold ml-2 text-lg">$1,749</span>
+                                </div>
+                                <button class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition duration-300">
+                                    Book Now
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Deal 2 -->
+                <div class="bg-white rounded-xl overflow-hidden shadow-lg card-hover">
+                    <div class="md:flex">
+                        <div class="md:w-1/3">
+                            <img src="https://images.unsplash.com/photo-1527631746610-bca00a040d60?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Rome" class="w-full h-full object-cover">
+                        </div>
+                        <div class="p-6 md:w-2/3">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="text-xl font-bold text-gray-900">Rome & Amalfi Coast</h3>
+                                <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded">25% OFF</span>
+                            </div>
+                            <div class="flex items-center text-gray-600 mb-4">
+                                <i class="fas fa-map-marker-alt text-sm mr-2"></i>
+                                <span class="text-sm">Italy</span>
+                                <span class="mx-2">•</span>
+                                <i class="fas fa-calendar-alt text-sm mr-2"></i>
+                                <span class="text-sm">10 Days</span>
+                            </div>
+                            <p class="text-gray-600 mb-4">
+                                Explore ancient ruins, indulge in authentic Italian cuisine, and relax on the stunning Amalfi Coast.
+                            </p>
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <span class="text-gray-500 line-through text-sm">$3,199</span>
+                                    <span class="text-indigo-600 font-bold ml-2 text-lg">$2,399</span>
+                                </div>
+                                <button class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition duration-300">
+                                    Book Now
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Deal 3 -->
+                <div class="bg-white rounded-xl overflow-hidden shadow-lg card-hover">
+                    <div class="md:flex">
+                        <div class="md:w-1/3">
+                            <img src="https://images.unsplash.com/photo-1518391846015-55a9cc003b25?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Safari" class="w-full h-full object-cover">
+                        </div>
+                        <div class="p-6 md:w-2/3">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="text-xl font-bold text-gray-900">African Safari Adventure</h3>
+                                <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded">20% OFF</span>
+                            </div>
+                            <div class="flex items-center text-gray-600 mb-4">
+                                <i class="fas fa-map-marker-alt text-sm mr-2"></i>
+                                <span class="text-sm">Kenya & Tanzania</span>
+                                <span class="mx-2">•</span>
+                                <i class="fas fa-calendar-alt text-sm mr-2"></i>
+                                <span class="text-sm">12 Days</span>
+                            </div>
+                            <p class="text-gray-600 mb-4">
+                                Witness the Great Migration, stay in luxury lodges, and experience the thrill of wildlife encounters.
+                            </p>
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <span class="text-gray-500 line-through text-sm">$4,999</span>
+                                    <span class="text-indigo-600 font-bold ml-2 text-lg">$3,999</span>
+                                </div>
+                                <button class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition duration-300">
+                                    Book Now
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Deal 4 -->
+                <div class="bg-white rounded-xl overflow-hidden shadow-lg card-hover">
+                    <div class="md:flex">
+                        <div class="md:w-1/3">
+                            <img src="https://images.unsplash.com/photo-1533107862482-0e6974b06ec4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Kyoto" class="w-full h-full object-cover">
+                        </div>
+                        <div class="p-6 md:w-2/3">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="text-xl font-bold text-gray-900">Japanese Cultural Journey</h3>
+                                <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded">15% OFF</span>
+                            </div>
+                            <div class="flex items-center text-gray-600 mb-4">
+                                <i class="fas fa-map-marker-alt text-sm mr-2"></i>
+                                <span class="text-sm">Japan</span>
+                                <span class="mx-2">•</span>
+                                <i class="fas fa-calendar-alt text-sm mr-2"></i>
+                                <span class="text-sm">14 Days</span>
+                            </div>
+                            <p class="text-gray-600 mb-4">
+                                From Tokyo's neon lights to Kyoto's ancient temples, experience the best of traditional and modern Japan.
+                            </p>
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <span class="text-gray-500 line-through text-sm">$3,799</span>
+                                    <span class="text-indigo-600 font-bold ml-2 text-lg">$3,229</span>
+                                </div>
+                                <button class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition duration-300">
+                                    Book Now
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Products Section -->
-    <section class="py-12 bg-gray-50">
-        <div class="container mx-auto px-4">
-            <div class="flex justify-between items-center mb-8">
-                <h2 class="text-3xl font-bold">Featured Products</h2>
-                <div class="flex space-x-2">
-                    <button class="px-4 py-2 bg-white border rounded-lg hover:bg-gray-100">All</button>
-                    <button class="px-4 py-2 bg-white border rounded-lg hover:bg-gray-100">Men</button>
-                    <button class="px-4 py-2 bg-white border rounded-lg hover:bg-gray-100">Women</button>
-                    <button class="px-4 py-2 bg-white border rounded-lg hover:bg-gray-100">Kids</button>
-                </div>
+    <!-- Why Choose Us -->
+    <section class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Why Choose Voyageur</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    We go above and beyond to ensure your travel experience is seamless and unforgettable.
+                </p>
             </div>
             
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-                <!-- Product 1 -->
-                <div class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition duration-300 animate-fade-in">
-                    <div class="relative">
-                        <img src="https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1469&q=80" alt="Product 1" class="w-full h-64 object-cover">
-                        <div class="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">SALE</div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="text-center p-6 rounded-xl bg-gray-50 hover:bg-indigo-50 transition duration-300 animate__animated animate__fadeIn" style="animation-delay: 0.3s">
+                    <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-shield-alt text-indigo-600 text-2xl"></i>
                     </div>
-                    <div class="p-4">
-                        <div class="flex justify-between items-start mb-2">
-                            <h3 class="font-semibold text-lg">Classic White Tee</h3>
-                            <div class="flex items-center">
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <span class="ml-1 text-sm">4.8</span>
-                            </div>
-                        </div>
-                        <p class="text-gray-600 text-sm mb-3">Premium cotton t-shirt for everyday wear</p>
-                        <div class="flex justify-between items-center">
-                            <div>
-                                <span class="font-bold text-gray-800">$24.99</span>
-                                <span class="text-sm text-gray-500 line-through ml-2">$29.99</span>
-                            </div>
-                            <button class="add-to-cart bg-indigo-600 text-white px-3 py-1 rounded-lg text-sm hover:bg-indigo-700 transition" data-id="1" data-name="Classic White Tee" data-price="24.99" data-image="https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1469&q=80">
-                                Add to Cart
-                            </button>
-                        </div>
-                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Best Price Guarantee</h3>
+                    <p class="text-gray-600">
+                        We guarantee the best prices for all our travel packages. Found a better deal? We'll match it!
+                    </p>
                 </div>
                 
-                <!-- Product 2 -->
-                <div class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition duration-300 animate-fade-in delay-100">
-                    <div class="relative">
-                        <img src="https://images.unsplash.com/photo-1551232864-3f0890e580d9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80" alt="Product 2" class="w-full h-64 object-cover">
+                <div class="text-center p-6 rounded-xl bg-gray-50 hover:bg-indigo-50 transition duration-300">
+                    <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-headset text-indigo-600 text-2xl"></i>
                     </div>
-                    <div class="p-4">
-                        <div class="flex justify-between items-start mb-2">
-                            <h3 class="font-semibold text-lg">Slim Fit Jeans</h3>
-                            <div class="flex items-center">
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <span class="ml-1 text-sm">4.5</span>
-                            </div>
-                        </div>
-                        <p class="text-gray-600 text-sm mb-3">Comfortable denim with stretch technology</p>
-                        <div class="flex justify-between items-center">
-                            <div>
-                                <span class="font-bold text-gray-800">$49.99</span>
-                            </div>
-                            <button class="add-to-cart bg-indigo-600 text-white px-3 py-1 rounded-lg text-sm hover:bg-indigo-700 transition" data-id="2" data-name="Slim Fit Jeans" data-price="49.99" data-image="https://images.unsplash.com/photo-1551232864-3f0890e580d9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80">
-                                Add to Cart
-                            </button>
-                        </div>
-                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">24/7 Customer Support</h3>
+                    <p class="text-gray-600">
+                        Our travel experts are available round the clock to assist you with any queries or emergencies.
+                    </p>
                 </div>
                 
-                <!-- Product 3 -->
-                <div class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition duration-300 animate-fade-in delay-200">
-                    <div class="relative">
-                        <img src="https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=736&q=80" alt="Product 3" class="w-full h-64 object-cover">
-                        <div class="absolute top-2 right-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">NEW</div>
+                <div class="text-center p-6 rounded-xl bg-gray-50 hover:bg-indigo-50 transition duration-300">
+                    <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-map-marked-alt text-indigo-600 text-2xl"></i>
                     </div>
-                    <div class="p-4">
-                        <div class="flex justify-between items-start mb-2">
-                            <h3 class="font-semibold text-lg">Leather Jacket</h3>
-                            <div class="flex items-center">
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <span class="ml-1 text-sm">4.9</span>
-                            </div>
-                        </div>
-                        <p class="text-gray-600 text-sm mb-3">Premium genuine leather with soft lining</p>
-                        <div class="flex justify-between items-center">
-                            <div>
-                                <span class="font-bold text-gray-800">$129.99</span>
-                            </div>
-                            <button class="add-to-cart bg-indigo-600 text-white px-3 py-1 rounded-lg text-sm hover:bg-indigo-700 transition" data-id="3" data-name="Leather Jacket" data-price="129.99" data-image="https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=736&q=80">
-                                Add to Cart
-                            </button>
-                        </div>
-                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Local Experts</h3>
+                    <p class="text-gray-600">
+                        Our carefully selected local guides ensure you experience each destination like a true insider.
+                    </p>
                 </div>
-                
-                <!-- Product 4 -->
-                <div class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition duration-300 animate-fade-in delay-300">
-                    <div class="relative">
-                        <img src="https://images.unsplash.com/photo-1549298916-b41d501d3772?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1112&q=80" alt="Product 4" class="w-full h-64 object-cover">
-                    </div>
-                    <div class="p-4">
-                        <div class="flex justify-between items-start mb-2">
-                            <h3 class="font-semibold text-lg">Running Shoes</h3>
-                            <div class="flex items-center">
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <span class="ml-1 text-sm">4.7</span>
-                            </div>
-                        </div>
-                        <p class="text-gray-600 text-sm mb-3">Lightweight with responsive cushioning</p>
-                        <div class="flex justify-between items-center">
-                            <div>
-                                <span class="font-bold text-gray-800">$89.99</span>
-                                <span class="text-sm text-gray-500 line-through ml-2">$99.99</span>
-                            </div>
-                            <button class="add-to-cart bg-indigo-600 text-white px-3 py-1 rounded-lg text-sm hover:bg-indigo-700 transition" data-id="4" data-name="Running Shoes" data-price="89.99" data-image="https://images.unsplash.com/photo-1549298916-b41d501d3772?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1112&q=80">
-                                Add to Cart
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="text-center mt-10">
-                <button class="px-6 py-3 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition">
-                    View All Products
-                </button>
             </div>
         </div>
     </section>
 
     <!-- Testimonials -->
-    <section class="py-12 bg-white">
-        <div class="container mx-auto px-4">
-            <h2 class="text-3xl font-bold text-center mb-12">What Our Customers Say</h2>
+    <section id="testimonials" class="py-16 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Traveler Stories</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Don't just take our word for it. Here's what our travelers have to say about their experiences.
+                </p>
+            </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="bg-gray-50 p-6 rounded-lg shadow-sm animate-fade-in">
-                    <div class="flex items-center mb-4">
-                        <div class="h-12 w-12 rounded-full bg-indigo-100 flex items-center justify-center">
-                            <i class="fas fa-user text-indigo-600"></i>
+            <div id="testimonials-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Reviews will be loaded here dynamically -->
+            </div>
+            
+            <div class="mt-12 text-center">
+                <button id="add-review-btn" class="bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-indigo-700 transition duration-300">
+                    <i class="fas fa-plus mr-2"></i> Add Your Review
+                </button>
+            </div>
+            
+            <!-- Review Form Modal -->
+            <div id="review-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+                <div class="bg-white rounded-lg p-8 max-w-md w-full">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-2xl font-bold">Share Your Experience</h3>
+                        <button id="close-review-modal" class="text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <form id="review-form">
+                        <div class="mb-4">
+                            <input type="text" id="review-name" placeholder="Your Name" class="w-full px-4 py-3 border rounded-lg">
                         </div>
+                        <div class="mb-4">
+                            <select id="review-rating" class="w-full px-4 py-3 border rounded-lg">
+                                <option value="">Select Rating</option>
+                                <option value="5">5 Stars</option>
+                                <option value="4">4 Stars</option>
+                                <option value="3">3 Stars</option>
+                                <option value="2">2 Stars</option>
+                                <option value="1">1 Star</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <input type="text" id="review-location" placeholder="Location Visited" class="w-full px-4 py-3 border rounded-lg">
+                        </div>
+                        <div class="mb-4">
+                            <textarea id="review-text" rows="4" placeholder="Your review..." class="w-full px-4 py-3 border rounded-lg"></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-indigo-600 text-white py-3 rounded-lg font-medium">
+                            Submit Review
+                        </button>
+                    </form>
+                </div>
+            </div>
+                    <div class="flex items-center mb-4">
+                        <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Sarah J." class="w-12 h-12 rounded-full object-cover">
                         <div class="ml-4">
-                            <h4 class="font-semibold">Sarah Johnson</h4>
-                            <div class="flex">
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
+                            <h4 class="font-bold text-gray-900">Sarah J.</h4>
+                            <div class="flex text-yellow-400">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
                             </div>
                         </div>
                     </div>
-                    <p class="text-gray-600">"The quality of the t-shirts is amazing! They're so comfortable and the fit is perfect. Will definitely order again."</p>
+                    <p class="text-gray-600 italic mb-4">
+                        "Our trip to Bali was absolutely magical! Voyageur took care of every detail, from airport transfers to amazing hotel recommendations. The private tour guide they arranged was knowledgeable and made our experience so special."
+                    </p>
+                    <div class="text-sm text-gray-500">
+                        <i class="fas fa-map-marker-alt mr-2"></i> Bali, Indonesia • June 2023
+                    </div>
                 </div>
                 
-                <div class="bg-gray-50 p-6 rounded-lg shadow-sm animate-fade-in delay-100">
+                <div class="testimonial-card p-6 animate__animated animate__fadeIn" style="animation-delay: 0.4s">
                     <div class="flex items-center mb-4">
-                        <div class="h-12 w-12 rounded-full bg-indigo-100 flex items-center justify-center">
-                            <i class="fas fa-user text-indigo-600"></i>
-                        </div>
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Michael T." class="w-12 h-12 rounded-full object-cover">
                         <div class="ml-4">
-                            <h4 class="font-semibold">Michael Chen</h4>
-                            <div class="flex">
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star-half-alt text-yellow-400"></i>
+                            <h4 class="font-bold text-gray-900">Michael T.</h4>
+                            <div class="flex text-yellow-400">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
                             </div>
                         </div>
                     </div>
-                    <p class="text-gray-600">"Fast shipping and excellent customer service. The leather jacket is even better in person than in the photos."</p>
+                    <p class="text-gray-600 italic mb-4">
+                        "I've traveled with many companies, but Voyageur stands out. Their attention to detail is impeccable. When our flight was delayed, they had already arranged alternative transportation before we even landed!"
+                    </p>
+                    <div class="text-sm text-gray-500">
+                        <i class="fas fa-map-marker-alt mr-2"></i> Santorini, Greece • August 2023
+                    </div>
                 </div>
                 
-                <div class="bg-gray-50 p-6 rounded-lg shadow-sm animate-fade-in delay-200">
+                <div class="testimonial-card p-6">
                     <div class="flex items-center mb-4">
-                        <div class="h-12 w-12 rounded-full bg-indigo-100 flex items-center justify-center">
-                            <i class="fas fa-user text-indigo-600"></i>
-                        </div>
+                        <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Jennifer L." class="w-12 h-12 rounded-full object-cover">
                         <div class="ml-4">
-                            <h4 class="font-semibold">Emma Rodriguez</h4>
-                            <div class="flex">
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
+                            <h4 class="font-bold text-gray-900">Jennifer L.</h4>
+                            <div class="flex text-yellow-400">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
                             </div>
                         </div>
                     </div>
-                    <p class="text-gray-600">"I bought the running shoes for my marathon training and they're perfect! Lightweight but with great support."</p>
+                    <p class="text-gray-600 italic mb-4">
+                        "The African safari package exceeded all expectations. Voyageur's local partners were exceptional, and we saw the Big Five within our first two days! The luxury lodges were beyond anything we imagined."
+                    </p>
+                    <div class="text-sm text-gray-500">
+                        <i class="fas fa-map-marker-alt mr-2"></i> Serengeti, Tanzania • March 2023
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Newsletter -->
-    <section class="py-12 bg-indigo-600 text-white">
-        <div class="container mx-auto px-4 text-center">
-            <h2 class="text-3xl font-bold mb-4 animate-fade-in">Stay Updated</h2>
-            <p class="text-xl mb-8 max-w-2xl mx-auto animate-fade-in delay-100">Subscribe to our newsletter for exclusive offers, new arrivals, and style tips.</p>
-            
-            <div class="flex flex-col sm:flex-row justify-center max-w-md mx-auto animate-fade-in delay-200">
-                <input type="email" placeholder="Your email address" class="px-4 py-3 rounded-lg sm:rounded-r-none w-full text-gray-800 focus:outline-none">
-                <button class="mt-2 sm:mt-0 px-6 py-3 bg-indigo-800 rounded-lg sm:rounded-l-none font-medium hover:bg-indigo-900 transition">
+    <section class="py-16 bg-indigo-600 text-white">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-3xl md:text-4xl font-bold mb-6">Get Travel Inspiration</h2>
+            <p class="text-lg mb-8 max-w-2xl mx-auto">
+                Subscribe to our newsletter and receive exclusive deals, travel tips, and destination inspiration straight to your inbox.
+            </p>
+            <form class="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+                <input type="email" placeholder="Your email address" class="flex-grow px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300 text-gray-900">
+                <button type="submit" class="bg-white text-indigo-600 px-6 py-3 rounded-lg font-medium hover:bg-gray-100 transition duration-300 animate__animated animate__pulse animate__infinite">
                     Subscribe
                 </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Contact -->
+    <section id="contact" class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <div>
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-6">Get In Touch</h2>
+                    <p class="text-gray-600 mb-8">
+                        Have questions about your next adventure? Our travel experts are here to help you plan the perfect getaway.
+                    </p>
+                    
+                    <div class="space-y-6">
+                        <div class="flex items-start">
+                            <div class="bg-indigo-100 p-3 rounded-full mr-4">
+                                <i class="fas fa-phone-alt text-indigo-600"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-900">Call Us</h4>
+                                <p class="text-gray-600">+1 (555) 123-4567</p>
+                                <p class="text-sm text-gray-500">Available 24/7</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <div class="bg-indigo-100 p-3 rounded-full mr-4">
+                                <i class="fas fa-envelope text-indigo-600"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-900">Email Us</h4>
+                                <p class="text-gray-600">hello@voyageur.com</p>
+                                <p class="text-sm text-gray-500">Typically responds within 2 hours</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <div class="bg-indigo-100 p-3 rounded-full mr-4">
+                                <i class="fas fa-map-marker-alt text-indigo-600"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-900">Visit Us</h4>
+                                <p class="text-gray-600">123 Travel Street, Suite 100</p>
+                                <p class="text-gray-600">New York, NY 10001</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="bg-gray-50 p-8 rounded-xl animate__animated animate__fadeInRight">
+                        <h3 class="text-xl font-bold text-gray-900 mb-6">Send Us a Message</h3>
+                        <form>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-gray-700 text-sm font-medium mb-2" for="first-name">First Name</label>
+                                    <input type="text" id="first-name" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 text-sm font-medium mb-2" for="last-name">Last Name</label>
+                                    <input type="text" id="last-name" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-medium mb-2" for="email">Email</label>
+                                <input type="email" id="email" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-medium mb-2" for="subject">Subject</label>
+                                <input type="text" id="subject" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                            </div>
+                            <div class="mb-6">
+                                <label class="block text-gray-700 text-sm font-medium mb-2" for="message">Message</label>
+                                <textarea id="message" rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                            </div>
+                            <button type="submit" class="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-indigo-700 transition duration-300">
+                                Send Message
+                            </button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Shopping Cart Sidebar -->
-    <div id="cart-sidebar" class="cart-slide fixed top-0 right-0 h-full w-full sm:w-96 bg-white shadow-lg z-50 overflow-y-auto">
-        <div class="p-6">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-xl font-bold">Your Cart (<span id="cart-items-count">0</span>)</h3>
-                <button id="close-cart" class="text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <div id="cart-items" class="mb-6">
-                <!-- Cart items will be added here dynamically -->
-                <div class="text-center py-8 text-gray-500" id="empty-cart-message">
-                    <i class="fas fa-shopping-cart text-4xl mb-4"></i>
-                    <p>Your cart is empty</p>
-                </div>
-            </div>
-            
-            <div class="border-t pt-4">
-                <div class="flex justify-between mb-2">
-                    <span class="font-medium">Subtotal</span>
-                    <span id="cart-subtotal">$0.00</span>
-                </div>
-                <div class="flex justify-between mb-4">
-                    <span class="font-medium">Shipping</span>
-                    <span>Free</span>
-                </div>
-                <div class="flex justify-between font-bold text-lg">
-                    <span>Total</span>
-                    <span id="cart-total">$0.00</span>
-                </div>
-                
-                <button id="checkout-btn" class="w-full mt-6 bg-indigo-600 text-white py-3 rounded-lg font-medium hover:bg-indigo-700 transition disabled:opacity-50" disabled>
-                    Proceed to Checkout
-                </button>
-                
-                <button class="w-full mt-2 border border-indigo-600 text-indigo-600 py-3 rounded-lg font-medium hover:bg-indigo-50 transition">
-                    Continue Shopping
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Overlay for cart/mobile menu -->
-    <div id="overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-40"></div>
-
     <!-- Footer -->
-    <footer class="bg-gray-900 text-white py-12">
-        <div class="container mx-auto px-4">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+    <footer class="bg-gray-900 text-white pt-16 pb-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
                 <div>
-                    <div class="flex items-center space-x-2 mb-4">
-                        <i class="fas fa-tshirt text-2xl text-indigo-400"></i>
-                        <h3 class="text-xl font-bold">UrbanStyle</h3>
-                    </div>
-                    <p class="text-gray-400 mb-4">Fashion that fits your lifestyle. Quality clothing for everyone.</p>
+                    <h3 class="text-xl font-bold mb-4">Voyageur</h3>
+                    <p class="text-gray-400 mb-4">
+                        Making travel dreams a reality since 2010. We specialize in creating unforgettable experiences around the globe.
+                    </p>
                     <div class="flex space-x-4">
-                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-twitter"></i></a>
-                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-pinterest"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition duration-300">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition duration-300">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition duration-300">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition duration-300">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
                     </div>
                 </div>
                 
                 <div>
-                    <h4 class="font-bold text-lg mb-4">Shop</h4>
+                    <h4 class="text-lg font-semibold mb-4">Destinations</h4>
                     <ul class="space-y-2">
-                        <li><a href="#" class="text-gray-400 hover:text-white">Men's Clothing</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white">Women's Clothing</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white">Kids' Collection</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white">Accessories</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white">Sale Items</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Europe</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Asia</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Africa</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">North America</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">South America</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Oceania</a></li>
                     </ul>
                 </div>
                 
                 <div>
-                    <h4 class="font-bold text-lg mb-4">Help</h4>
+                    <h4 class="text-lg font-semibold mb-4">Company</h4>
                     <ul class="space-y-2">
-                        <li><a href="#" class="text-gray-400 hover:text-white">Customer Service</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white">Track Order</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white">Returns & Exchanges</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white">Shipping Info</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white">FAQ</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">About Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Careers</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Blog</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Press</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Partners</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Contact</a></li>
                     </ul>
                 </div>
                 
                 <div>
-                    <h4 class="font-bold text-lg mb-4">Contact</h4>
+                    <h4 class="text-lg font-semibold mb-4">Support</h4>
                     <ul class="space-y-2">
-                        <li class="flex items-start">
-                            <i class="fas fa-map-marker-alt mt-1 mr-2 text-indigo-400"></i>
-                            <span class="text-gray-400">123 Fashion St, Style City, SC 12345</span>
-                        </li>
-                        <li class="flex items-center">
-                            <i class="fas fa-phone-alt mr-2 text-indigo-400"></i>
-                            <span class="text-gray-400">(123) 456-7890</span>
-                        </li>
-                        <li class="flex items-center">
-                            <i class="fas fa-envelope mr-2 text-indigo-400"></i>
-                            <span class="text-gray-400">info@urbanstyle.com</span>
-                        </li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Help Center</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Safety Information</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Cancellation Policy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">FAQs</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Privacy Policy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Terms of Service</a></li>
                     </ul>
                 </div>
             </div>
             
-            <div class="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
-                <p class="text-gray-400 text-sm mb-4 md:mb-0">© 2023 UrbanStyle. All rights reserved.</p>
+            <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400 text-sm mb-4 md:mb-0">
+                    &copy; 2023 Voyageur. All rights reserved.
+                </p>
                 <div class="flex space-x-6">
-                    <a href="#" class="text-gray-400 hover:text-white text-sm">Privacy Policy</a>
-                    <a href="#" class="text-gray-400 hover:text-white text-sm">Terms of Service</a>
-                    <a href="#" class="text-gray-400 hover:text-white text-sm">Cookie Policy</a>
+                    <a href="#" class="text-gray-400 hover:text-white text-sm transition duration-300">Privacy Policy</a>
+                    <a href="#" class="text-gray-400 hover:text-white text-sm transition duration-300">Terms of Service</a>
+                    <a href="#" class="text-gray-400 hover:text-white text-sm transition duration-300">Sitemap</a>
                 </div>
             </div>
         </div>
     </footer>
 
+    <!-- Login/Signup Modal -->
+    <div id="auth-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold">Welcome to Voyageur</h3>
+                <button id="close-modal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div id="auth-forms">
+                <!-- Login Form -->
+                <form id="login-form" class="mb-6">
+                    <div class="mb-4">
+                        <input type="email" id="login-email" placeholder="Email" class="w-full px-4 py-3 border rounded-lg">
+                    </div>
+                    <div class="mb-4">
+                        <input type="password" id="login-password" placeholder="Password" class="w-full px-4 py-3 border rounded-lg">
+                    </div>
+                    <button type="submit" class="w-full bg-indigo-600 text-white py-3 rounded-lg font-medium">
+                        Sign In
+                    </button>
+                </form>
+                
+                <!-- Signup Form -->
+                <form id="signup-form" class="hidden">
+                    <div class="mb-4">
+                        <input type="text" id="signup-name" placeholder="Full Name" class="w-full px-4 py-3 border rounded-lg">
+                    </div>
+                    <div class="mb-4">
+                        <input type="email" id="signup-email" placeholder="Email" class="w-full px-4 py-3 border rounded-lg">
+                    </div>
+                    <div class="mb-4">
+                        <input type="password" id="signup-password" placeholder="Password" class="w-full px-4 py-3 border rounded-lg">
+                    </div>
+                    <button type="submit" class="w-full bg-indigo-600 text-white py-3 rounded-lg font-medium">
+                        Create Account
+                    </button>
+                </form>
+                
+                <p class="text-center text-gray-600">
+                    <span id="toggle-signup" class="text-indigo-600 cursor-pointer">Create an account</span>
+                    <span id="toggle-login" class="text-indigo-600 cursor-pointer hidden">Already have an account? Sign in</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/scrollreveal"></script>
     <script>
-        // Mobile menu toggle
-        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-        const mobileMenu = document.getElementById('mobile-menu');
-        const overlay = document.getElementById('overlay');
-        
-        mobileMenuBtn.addEventListener('click', () => {
-            mobileMenu.classList.toggle('hidden');
-            overlay.classList.toggle('hidden');
+        // Initialize ScrollReveal
+        ScrollReveal().reveal('.animate-on-scroll', {
+            delay: 200,
+            distance: '20px',
+            origin: 'bottom',
+            easing: 'ease-in-out',
+            interval: 100
         });
-        
-        // Search bar toggle
-        const searchBtn = document.getElementById('search-btn');
-        const searchBar = document.getElementById('search-bar');
-        
-        searchBtn.addEventListener('click', () => {
-            searchBar.classList.toggle('hidden');
-        });
-        
-        // Cart functionality
-        const cartBtn = document.getElementById('cart-btn');
-        const cartSidebar = document.getElementById('cart-sidebar');
-        const closeCartBtn = document.getElementById('close-cart');
-        const cartCount = document.getElementById('cart-count');
-        const cartItemsCount = document.getElementById('cart-items-count');
-        const cartItems = document.getElementById('cart-items');
-        const emptyCartMessage = document.getElementById('empty-cart-message');
-        const cartSubtotal = document.getElementById('cart-subtotal');
-        const cartTotal = document.getElementById('cart-total');
-        const checkoutBtn = document.getElementById('checkout-btn');
-        
-        let cart = [];
-        
-        // Toggle cart sidebar
-        cartBtn.addEventListener('click', () => {
-            cartSidebar.classList.add('show');
-            overlay.classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
-        });
-        
-        closeCartBtn.addEventListener('click', () => {
-            cartSidebar.classList.remove('show');
-            overlay.classList.add('hidden');
-            document.body.style.overflow = '';
-        });
-        
-        overlay.addEventListener('click', () => {
-            cartSidebar.classList.remove('show');
-            mobileMenu.classList.add('hidden');
-            overlay.classList.add('hidden');
-            document.body.style.overflow = '';
-        });
-        
-        // Add to cart functionality
-        document.querySelectorAll('.add-to-cart').forEach(button => {
-            button.addEventListener('click', () => {
-                const id = button.getAttribute('data-id');
-                const name = button.getAttribute('data-name');
-                const price = parseFloat(button.getAttribute('data-price'));
-                const image = button.getAttribute('data-image');
-                
-                // Check if item already exists in cart
-                const existingItem = cart.find(item => item.id === id);
-                
-                if (existingItem) {
-                    existingItem.quantity += 1;
-                } else {
-                    cart.push({
-                        id,
-                        name,
-                        price,
-                        image,
-                        quantity: 1
-                    });
-                }
-                
-                updateCart();
-                
-                // Add animation to button
-                button.innerHTML = '<i class="fas fa-check"></i> Added';
-                button.classList.add('bg-green-500');
-                button.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
-                
-                setTimeout(() => {
-                    button.innerHTML = 'Add to Cart';
-                    button.classList.remove('bg-green-500');
-                    button.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
-                }, 2000);
+
+        // Sample JSON data for destinations
+        const destinationsData = [
+            {
+                id: 1,
+                name: "Paris, France",
+                region: "europe",
+                image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+                price: 1200,
+                rating: 4.8,
+                popular: true
+            },
+            // Add more destinations here...
+        ];
+
+        // Mobile menu toggle functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuButton = document.querySelector('.md\\:hidden');
+            const mobileMenu = document.querySelector('.hidden.md\\:block');
+            
+            mobileMenuButton.addEventListener('click', function() {
+                mobileMenu.classList.toggle('hidden');
+                mobileMenu.classList.toggle('block');
             });
-        });
-        
-        // Update cart UI
-        function updateCart() {
-            // Update cart count
-            const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
-            cartCount.textContent = totalItems;
-            cartItemsCount.textContent = totalItems;
             
-            // Update cart items list
-            if (cart.length === 0) {
-                emptyCartMessage.classList.remove('hidden');
-                cartItems.innerHTML = '';
-                checkoutBtn.disabled = true;
-            } else {
-                emptyCartMessage.classList.add('hidden');
-                
-                let itemsHTML = '';
-                let subtotal = 0;
-                
-                cart.forEach(item => {
-                    subtotal += item.price * item.quantity;
+            // Smooth scrolling for navigation links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
                     
-                    itemsHTML += `
-                        <div class="flex items-center py-4 border-b" data-id="${item.id}">
-                            <img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-cover rounded">
-                            <div class="ml-4 flex-1">
-                                <h4 class="font-medium">${item.name}</h4>
-                                <div class="flex justify-between items-center mt-1">
-                                    <span>$${item.price.toFixed(2)}</span>
-                                    <div class="flex items-center">
-                                        <button class="decrease-quantity px-2 text-gray-500 hover:text-indigo-600" data-id="${item.id}">
-                                            <i class="fas fa-minus"></i>
-                                        </button>
-                                        <span class="mx-2">${item.quantity}</span>
-                                        <button class="increase-quantity px-2 text-gray-500 hover:text-indigo-600" data-id="${item.id}">
-                                            <i class="fas fa-plus"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <button class="remove-item ml-4 text-gray-500 hover:text-red-500" data-id="${item.id}">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                    `;
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                    }
                 });
-                
-                cartItems.innerHTML = itemsHTML;
-                checkoutBtn.disabled = false;
-                
-                // Add event listeners to new buttons
-                document.querySelectorAll('.decrease-quantity').forEach(button => {
-                    button.addEventListener('click', (e) => {
-                        const id = e.currentTarget.getAttribute('data-id');
-                        const item = cart.find(item => item.id === id);
-                        
-                        if (item.quantity > 1) {
-                            item.quantity -= 1;
-                        } else {
-                            cart = cart.filter(item => item.id !== id);
-                        }
-                        
-                        updateCart();
-                    });
-                });
-                
-                document.querySelectorAll('.increase-quantity').forEach(button => {
-                    button.addEventListener('click', (e) => {
-                        const id = e.currentTarget.getAttribute('data-id');
-                        const item = cart.find(item => item.id === id);
-                        item.quantity += 1;
-                        updateCart();
-                    });
-                });
-                
-                document.querySelectorAll('.remove-item').forEach(button => {
-                    button.addEventListener('click', (e) => {
-                        const id = e.currentTarget.getAttribute('data-id');
-                        cart = cart.filter(item => item.id !== id);
-                        updateCart();
-                    });
-                });
-            }
+            });
             
-            // Update totals
-            const subtotalValue = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
-            cartSubtotal.textContent = `$${subtotalValue.toFixed(2)}`;
-            cartTotal.textContent = `$${subtotalValue.toFixed(2)}`;
-        }
-        
-        // Checkout button
-        checkoutBtn.addEventListener('click', () => {
-            alert('Checkout functionality would be implemented here!');
+            // Active navigation link highlighting
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            window.addEventListener('scroll', function() {
+                let current = '';
+                
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    const sectionHeight = section.clientHeight;
+                    
+                    if (pageYOffset >= (sectionTop - 100)) {
+                        current = section.getAttribute('id');
+                    }
+                });
+                
+                navLinks.forEach(link => {
+                    link.classList.remove('active-nav', 'text-gray-900');
+                    link.classList.add('text-gray-500');
+                    
+                    if (link.getAttribute('href') === `#${current}`) {
+                        link.classList.add('active-nav', 'text-gray-900');
+                        link.classList.remove('text-gray-500');
+                    }
+                });
+            });
+            
+            // Booking form date defaults
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            
+            document.getElementById('check-in').valueAsDate = today;
+            document.getElementById('check-out').valueAsDate = tomorrow;
         });
     </script>
-<p style="border-radius: 8px; text-align: center; font-size: 12px; color: #fff; margin-top: 16px;position: fixed; left: 8px; bottom: 8px; z-index: 10; background: rgba(0, 0, 0, 0.8); padding: 4px 8px;">Made with <img src="https://enzostvs-deepsite.hf.space/logo.svg" alt="DeepSite Logo" style="width: 16px; height: 16px; vertical-align: middle;display:inline-block;margin-right:3px;filter:brightness(0) invert(1);"><a href="https://enzostvs-deepsite.hf.space" style="color: #fff;text-decoration: underline;" target="_blank" >DeepSite</a> - 🧬 <a href="https://enzostvs-deepsite.hf.space?remix=kugan26/clothes" style="color: #fff;text-decoration: underline;" target="_blank" >Remix</a></p></body>
+</body>
 </html>
